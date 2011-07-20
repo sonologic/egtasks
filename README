@@ -1,0 +1,8 @@
+egtasks
+=======
+
+TODO:
+- implement 'work list' (view of all tasks)
+- implement hiding subtasks
+- implement expanding task description with <pre>
+
