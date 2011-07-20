@@ -6,8 +6,6 @@
 // @description    Extends google tasks canvas implementation - Copyright (c) 2011, "Koen Martens" <gmc@sonologic.nl>
 // ==/UserScript==
 
-alert('h4x0red?');
-
 if(window.document.body.children[0].id=="") {
   console.log('run');
 
