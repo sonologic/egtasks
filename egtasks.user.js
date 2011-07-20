@@ -4,7 +4,7 @@
 // @description    Extends google tasks canvas implementation
 // @include        https://mail.google.com/tasks/canvas
 // @description    Extends google tasks canvas implementation - Copyright (c) 2011, "Koen Martens" <gmc@sonologic.nl>
-// @require        http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js
+// @require        http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js
 // ==/UserScript==
 
 
@@ -18,38 +18,63 @@ function egtToggleSubTasks() {
   alert('toggle');
 }
 
+// add css
+function css(frame) {
+    var head, style;
+    head = frame.find('head');
+    if (!head) { return; }
+    style = $('<style/>',{'type':'text/css'});
+    style.append("\
+	.egtHeaderItem {\
+	  padding-left: 0.5em;\
+	}\
+    ");
+    frame.find('head').prepend(style);
+
+}
+
 // the main body of the script
 function execute() {
   console.log('roll');
+  console.log($().jquery);
 
-  var idocument = document.body.getElementsByTagName("iframe")[0].contentDocument;
+//  var idocument = document.body.getElementsByTagName("iframe")[0].contentDocument;
 
-  var newCol = idocument.createElement("td");
+  var frame = $("iframe").contents();
+  css(frame);
 
-  newCol.setAttribute('class','egtasksWorklist');
-  newCol.style.width="20%";
-  newCol.innerHTML="work list";
+  var newCol=$('<td></td>');
+  newCol.attr('id',"egtWorkList");
+  newCol.css('width','20%');
+  newCol.html("working list jquery style");  
+  frame.find('table.vc > tbody > tr').append(newCol);
 
-  idocument.getElementsByTagName("table")[0].firstChild.firstChild.appendChild(newCol);
+  frame.find('#\\:1\\.h').before($('<div id="egtHeader"></div>'));
+  frame.find('#egtHeader').height('1.2em');
+  frame.find('#egtHeader').css('background','#B3B9FF');
+  frame.find('#egtHeader').append($('<span></span>', {
+				'class': 'egtHeaderItem',
+				text: "egtasks 0.1 activated"
+  }));
 
-  var newHeader = idocument.createElement("div");
-  newHeader.setAttribute('class','egtasksHeader');
-  newHeader.style.height="1.2em";
-  newHeader.style.background="#B3B9FF";
-  newHeader.style.padding="0 0 0 0.5em";
+  frame.find('#egtHeader').append($('<a></a>', {
+				'class': 'egtHeaderItem',
+				href: 'javascript:',
+				text: "hide subtasks",
+				click: function() {
+					var display='none';
+					if($(this).text()=='hide subtasks') {
+						$(this).text("show subtasks");
+					} else {
+						$(this).text("hide subtasks");
+						display='table-row';
+					}
+					frame.find("#\\:0\\.tl > table tr").filter(function(index) { return $("td.p > div.G",this).css('padding-left')!='0px'; }).css('display',display);
+				}
+  }));
 
-  newHeader.appendChild(idocument.createTextNode("egtasks 0.1 activated"));
-
-  link1=idocument.createElement('a');
-  link1.setAttribute('href','javascript:egtToggleSubTasks()');
-  link1.appendChild(idocument.createTextNode("hide subtasks"));
-  link1.style.padding="0 0 0 0.5em";
-  
-  newHeader.appendChild(link1);
-
-  idocument.body.insertBefore(newHeader,idocument.getElementsByTagName('div')[0]);
-
-  idocument.getElementById(':1.lt').style.top="1.22em";
+  frame.find("#\\:1\\.lt").css('top','1.22em');
+			
 }
 
 // only run on canvas itself, not firebug console
