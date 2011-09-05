@@ -33,8 +33,42 @@ function css(frame) {
 
 }
 
+function getTasks() {
+}
+
+function initializeWorkingList(element) {
+  console.log('Initialize working list..');
+
+
+  element.append('<div id="egt:1.mm" class="wc"></div>');
+  element.append('<div id="egtWorklistHeader" style="padding: 6px 0 5px 0;" class="goog-toolbar CSS_TASKS_TOOLBAR">');
+  element.find("#egtWorklistHeader").append('<div class="goog-toolbar-separator goog-inline-block" role="separator"></div>');
+  element.find("#egtWorklistHeader").append('<div class="goog-inline-block ic fc">Work list</div>');
+
+  element.append('<div id="egtWorklistContainer"></div>');
+  element.find("#egtWorklistContainer").append('<div id="egtWorklistContent"></div>');
+
+  div=element.find("#egtWorklistContent");
+
+  $.ajax({
+    type: "POST",
+    dataType: "json",
+    url: 'https://mail.google.com/tasks/r/d',
+    data: {r:'{"action_list":[{"action_type":"get_all","action_id":"1","list_id":"0","get_deleted":false}],"client_version":13128942}'},
+    headers: {'AT':'1'},
+    success: function(data) {
+	console.dir(data);
+	div.append("<ul></ul>");
+	for(list in data.lists) {
+	  div.find("ul").append("<li>"+data.lists[list].name+"</li>");
+	}
+    },
+  });
+}
+
 // the main body of the script
 function execute() {
+  console=unsafeWindow.console;
   console.log('roll');
   console.log($().jquery);
 
@@ -46,8 +80,15 @@ function execute() {
   var newCol=$('<td></td>');
   newCol.attr('id',"egtWorkList");
   newCol.css('width','20%');
-  newCol.html("working list jquery style");  
+  //newCol.css('vertical-align','top');
+  newCol.attr('role','toolbar');
+  newCol.attr('class','hc');
+  newCol.html("");  
   frame.find('table.vc > tbody > tr').append(newCol);
+
+  newCol.ready(function() {
+    initializeWorkingList(newCol);
+  });
 
   frame.find('#\\:1\\.h').before($('<div id="egtHeader"></div>'));
   frame.find('#egtHeader').height('1.2em');
@@ -74,9 +115,11 @@ function execute() {
   }));
 
   frame.find("#\\:1\\.lt").css('top','1.22em');
-			
+
+	
 }
 
+console=unsafeWindow.console;
 // only run on canvas itself, not firebug console
 if(window.document.body.children[0].id=="") {
 
